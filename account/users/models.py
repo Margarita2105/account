@@ -23,7 +23,7 @@ class User(AbstractUser):
         )
     balance = models.IntegerField(blank=True, null=True)
     freeze_balance = models.IntegerField(blank=True, null=True)
-    password = models.CharField(max_length=9)
+    confirmation_code = models.CharField(max_length=9)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

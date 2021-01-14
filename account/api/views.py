@@ -1,3 +1,5 @@
+import secrets
+
 from django.core.mail import send_mail
 
 from rest_framework.views import APIView
@@ -60,11 +62,11 @@ class RegistrationView(APIView):
 
             send_mail(
                 'Registration',
-                'Your password is ' + str(password),
+                'Your confirmation code is ' + str(confirmation_code),
                 'from@gmail.com',
                 [str(email)],
                 fail_silently=False,
             )
-            return Response({'details': 'Ваши данные высланы вам на почту'},
+            return Response({'details': 'Код подтверждения выслан вам на почту'},
                 status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
