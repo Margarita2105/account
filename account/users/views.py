@@ -5,7 +5,6 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from users.serializers import UserSerializer
-
 from users.models import User
 
 
