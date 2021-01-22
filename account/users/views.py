@@ -1,10 +1,10 @@
-from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
-from rest_framework import viewsets, status
+
+from rest_framework import generics, viewsets, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UserSignInSerializer
 from users.models import User
 
 
@@ -18,18 +18,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class GetToken(APIView):
 
+    serializer_class = UserSignInSerializer
+
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-        try:
-            user = get_object_or_404(User, email=email, password=password)
-            user.is_active = True
-            user.save()
-            return Response({'token': user.get_token()})
-
-        except User.DoesNotExist:
-            return Response(
-                data={'detail': 'Пользователя с такими данными не существует'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        return Response({'token': serializer.get_token()})
