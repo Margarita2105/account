@@ -6,11 +6,13 @@ from rest_framework.response import Response
 
 from users.serializers import UserSerializer, UserSignInSerializer
 from users.models import User
+from setting.permission import IsOwnerOrReadOnly
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsOwnerOrReadOnly]
     filterset_fields = ['username']
     ordering = ['id']
     lookup_field = 'username'
