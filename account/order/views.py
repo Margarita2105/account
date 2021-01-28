@@ -25,11 +25,3 @@ class RespondList(ListCreateAPIView):
     serializer_class = RespondSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['=executor__username', '=post__name']
-
-    def perform_create(self, serializer):
-        post = get_object_or_404(Post, name=self.request.data.get('name'))
-        
-        if Respond.objects.filter(executor=self.request.user, post=post).exists():
-            raise ValidationError('Вы уже откликнулись на объявление')
-
-        serializer.save(executor=self.request.user, post=post)
