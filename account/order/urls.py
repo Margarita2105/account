@@ -6,6 +6,7 @@ from order.views import PostViewSet, RespondList
 
 router = DefaultRouter()
 router.register('posts', PostViewSet)
+router.register(r'posts/(?P<posts_id>\d+)/respondlist', RespondListView, basename='respondlist')
 
 urlpatterns = [
     path('respond/', RespondList.as_view()),
