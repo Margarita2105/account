@@ -33,6 +33,7 @@ class Post(models.Model):
     expiration_date = models.DateTimeField("Крайний срок")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="customer")
     status = models.CharField(max_length=15, choices=PostStatus.choices, default=PostStatus.NEW)
+    executor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="executor", default=None)
 
     def __str__(self):
         return self.name
