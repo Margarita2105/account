@@ -20,9 +20,15 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def perform_update(self, serializer):
-        executor = get_object_or_404(Respond, pk=self.kwargs.get('respondlist_id'))
-        serializer.save(author=self.request.user, executor=executor)
+    @action(methods=['POST'], detail=True, permission_classes=[IsOwnerOrReadOnly,])
+    def approve(self, request, pk, executor_pk, *args, **kwargs):
+        data = {
+            'executor_pk': request.data.get('executor_pk'),
+            'post_pk': pk,
+        }
+        serializer = Serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
 
 class RespondList(ListCreateAPIView):
     queryset = Respond.objects.all()
