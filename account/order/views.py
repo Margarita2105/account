@@ -1,3 +1,5 @@
+from django.db import transaction
+from django.db.models import F
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, filters
 from rest_framework.exceptions import ValidationError
@@ -29,6 +31,47 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = Serializer(data=data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data)
+
+    @classmethod
+    def transactionfunc(cls, post_pk):
+        with transaction.atomic():
+            post = Post.objects.select_for_update().get(pk=post_pk)
+            try:
+                post.author.freeze_balance = post.price
+                post.author.balance = F('balance') - post.price
+                post.author.save()
+                status = 'success'
+            except:
+                status = 'Failed'
+            tr = cls(
+                author=post.author.email,
+                price=post.price,
+                status=status,
+            )
+        return tr
+
+        @classmethod
+    def payfunc(cls, post_pk):
+        with transaction.atomic():
+            post = Post.objects.select_for_update().get(pk=post_pk)
+            try:
+                post.author.freeze_balance = F('freeze_balance') - post.price
+                post.author.save()
+
+                post.executor.balance = F('balance') + post.price
+                post.executor.save()
+
+                status = 'success'
+            except:
+                status = 'Failed'
+            tr = cls(
+                author=post.author.email,
+                executor=post.executor.email
+                price=post.price,
+                status=status,
+                type='pay',
+            )
+        return tr
 
 class RespondList(ListCreateAPIView):
     queryset = Respond.objects.all()
