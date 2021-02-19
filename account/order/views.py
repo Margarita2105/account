@@ -50,7 +50,7 @@ class PostViewSet(viewsets.ModelViewSet):
             )
         return tr
 
-        @classmethod
+    @classmethod
     def payfunc(cls, post_pk):
         with transaction.atomic():
             post = Post.objects.select_for_update().get(pk=post_pk)
